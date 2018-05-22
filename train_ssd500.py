@@ -785,7 +785,7 @@ def main():
 
     if args.epochs > 0:
         train_loader = torch.utils.data.DataLoader(
-            VOCClassPascal(osp.expanduser('~/data/datasets'), box_coder, split='train', transform=True, load_cache = args.load_cache),
+            VOCClassPascal('data/datasets', box_coder, split='train', transform=True, load_cache = args.load_cache),
             batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
 
     # training
@@ -821,12 +821,12 @@ def main():
                 print('bounds_loss', bounds_loss.data[0])
                 print('sem_bounds_loss', sem_bounds_loss.data[0])
 
-    #torch.save(model, 'multitask.pth')
-    model = torch.load('multitask_backup.pth')
+    torch.save(model, 'multitask.pth')
+    #model = torch.load('multitask_backup.pth')
 
     # validation dataset
     val_loader = torch.utils.data.DataLoader(
-        VOCClassPascal(osp.expanduser('~/data/datasets'), box_coder, split='val', transform=True, load_cache = args.load_cache),
+        VOCClassPascal('data/datasets', box_coder, split='val', transform=True, load_cache = args.load_cache),
         batch_size=1, shuffle=False, num_workers=4, pin_memory=True)
 
 

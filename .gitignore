@@ -11,3 +11,6 @@ data/datasets/VOC/VOCdevkit/VOC2010/ImageSets/Segmentation/**
 !data/datasets/VOC/VOCdevkit/VOC2010/ImageSets/Segmentation/val_list.txt
 !data/datasets/VOC/VOCdevkit/VOC2010/intersection.txt
 
+multitask.pth
+trainparts.pickle
+
