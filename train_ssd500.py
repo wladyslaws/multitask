@@ -774,7 +774,7 @@ def main():
     parser.add_argument('--load_cache')
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1,0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     assert torch.cuda.is_available()
     torch.manual_seed(1337)
     torch.cuda.manual_seed(1337)
