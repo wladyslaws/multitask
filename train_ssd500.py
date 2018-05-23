@@ -689,7 +689,12 @@ class SSDBoxCoder:
 
         def argmax(x):
             v, i = x.max(0)
-            j = v.max(0)[1][0]
+            j_tensor = v.max(0)[1]
+            j = 0
+            if j_tensor.dim() == 0:
+                j = j_tensor.item()
+            else:
+                j = j_tensor[0]
             return (i[j], j)
 
         default_boxes = self.default_boxes  # xywh
