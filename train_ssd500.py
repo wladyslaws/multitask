@@ -225,7 +225,7 @@ class DenseNet(nn.Module):
         # Official init from torch repo.
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight.data)
+                nn.init.kaiming_normal(m.weight.data)
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
@@ -689,11 +689,7 @@ class SSDBoxCoder:
 
         def argmax(x):
             v, i = x.max(0)
-            j_tensor = v.max(0)[1]
-            if j_tensor.dim() == 0:
-                j = j_tensor.item()
-            else:
-                j = j_tensor[0]
+            j = v.max(0)[1][0]
             return (i[j], j)
 
         default_boxes = self.default_boxes  # xywh
@@ -817,13 +813,13 @@ def main():
                 print('\n\n')
                 print('epoch', epoch)
                 print('iteration in the epoch', batch_idx)
-                print('loss', loss.data.item())
-                print('cls_loss', cls_loss.data.item())
-                print('loc_loss', loc_loss.data.item())
-                print('seg_loss', seg_loss.data.item())
-                print('parts_loss', parts_loss.data.item())
-                print('bounds_loss', bounds_loss.data.item())
-                print('sem_bounds_loss', sem_bounds_loss.data.item())
+                print('loss', loss.data[0])
+                print('cls_loss', cls_loss.data[0])
+                print('loc_loss', loc_loss.data[0])
+                print('seg_loss', seg_loss.data[0])
+                print('parts_loss', parts_loss.data[0])
+                print('bounds_loss', bounds_loss.data[0])
+                print('sem_bounds_loss', sem_bounds_loss.data[0])
 
     torch.save(model, 'multitask.pth')
     #model = torch.load('multitask_backup.pth')
