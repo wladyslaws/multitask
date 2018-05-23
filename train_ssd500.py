@@ -690,7 +690,6 @@ class SSDBoxCoder:
         def argmax(x):
             v, i = x.max(0)
             j_tensor = v.max(0)[1]
-            j = 0
             if j_tensor.dim() == 0:
                 j = j_tensor.item()
             else:
