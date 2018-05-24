@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     libx11-6 \
  && rm -rf /var/lib/apt/lists/*
 
+# Install essentials
+RUN sudo apt-get install build-essential
+
 # Create a working directory
 RUN mkdir /app
 WORKDIR /app
@@ -76,6 +79,14 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
  && sudo rm -rf /var/lib/apt/lists/*
 RUN conda install -y -c menpo opencv3 \
  && conda clean -ya
+
+# Install pytz
+RUN conda install -y pytz \
+&& conda clean -ya
+
+# Install Cython
+RUN conda install -y Cython \
+&& conda clean -ya
 
 # Set the default command to python3
 CMD ["python3"]
