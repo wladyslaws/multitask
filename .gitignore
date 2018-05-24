@@ -16,4 +16,4 @@ trainparts.pickle
 valparts.pickle
 TIME*
 .idea/**
-
+lsyncd_config.lua
