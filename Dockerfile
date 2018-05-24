@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Install essentials
-RUN sudo apt-get install build-essential
+RUN apt-get install build-essential
 
 # Create a working directory
 RUN mkdir /app
@@ -80,12 +80,10 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
 RUN conda install -y -c menpo opencv3 \
  && conda clean -ya
 
-# Install pytz
+# Install pytz Cython
 RUN conda install -y pytz \
-&& conda clean -ya
-
-# Install Cython
-RUN conda install -y Cython \
+Cython \
+matplotlib \
 && conda clean -ya
 
 # Set the default command to python3
