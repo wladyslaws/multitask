@@ -34,11 +34,11 @@ RUN curl -so ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-4.4.1
  && rm ~/miniconda.sh
 ENV PATH=/home/user/miniconda/bin:$PATH
 
-# Create a Python 3.6 environment
+# Create a Python 3.5 environment
 RUN /home/user/miniconda/bin/conda install conda-build \
- && /home/user/miniconda/bin/conda create -y --name py36 python=3.6.4 \
+ && /home/user/miniconda/bin/conda create -y --name py35 python=3.5.2 \
  && /home/user/miniconda/bin/conda clean -ya
-ENV CONDA_DEFAULT_ENV=py36
+ENV CONDA_DEFAULT_ENV=py35
 ENV CONDA_PREFIX=/home/user/miniconda/envs/$CONDA_DEFAULT_ENV
 ENV PATH=$CONDA_PREFIX/bin:$PATH
 
