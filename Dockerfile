@@ -86,5 +86,11 @@ RUN pip install pytz
 RUN pip install matplotlib
 RUN pip install scikit-image
 
+#install PASCAL detail-api
+RUN git clone https://github.com/ccvl/detail-api
+RUN cd detail-api/PythonAPI
+RUN make
+RUN make install
+
 # Set the default command to python3
 CMD ["python3"]
