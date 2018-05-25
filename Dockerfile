@@ -81,10 +81,10 @@ RUN conda install -y -c menpo opencv3 \
  && conda clean -ya
 
 # Install pytz Cython
-RUN pip install -y Cython
-RUN pip install -y pytz
-RUN pip install -y matplotlib
-RUN pip install -y scikit-image
+RUN pip install Cython
+RUN pip install pytz
+RUN pip install matplotlib
+RUN pip install scikit-image
 
 # Set the default command to python3
 CMD ["python3"]
