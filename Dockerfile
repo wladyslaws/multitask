@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Install essentials
-RUN apt-get install build-essential
+RUN sudo apt-get update && sudo apt-get install -y build-essential
 
 # Create a working directory
 RUN mkdir /app
