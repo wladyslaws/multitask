@@ -831,7 +831,7 @@ def main():
 
 
     # validation dataset prediction
-    if False:
+    if True:
         model.eval()
         results = {}
         for batch_idx, (data, _, _, im_id, _, img_shape, _, _, _) in enumerate(val_loader):
