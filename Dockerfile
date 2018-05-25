@@ -1,4 +1,4 @@
-FROM nvidia/cuda:9.1-base-ubuntu16.04
+FROM nvidia/cuda:9.1-cudnn7-runtime-ubuntu16.04
 
 # Install some basic utilities
 RUN apt-get update && apt-get install -y \
@@ -81,10 +81,10 @@ RUN conda install -y -c menpo opencv3 \
  && conda clean -ya
 
 # Install pytz Cython
-RUN conda install -y pytz \
-Cython \
-matplotlib \
-&& conda clean -ya
+RUN pip install -y Cython
+RUN pip install -y pytz
+RUN pip install -y matplotlib
+RUN pip install -y scikit-image
 
 # Set the default command to python3
 CMD ["python3"]
