@@ -856,7 +856,7 @@ def main():
                 islice = 1*(seg_pred==i)
                 if np.sum(islice.flatten())>0:
                     new_cat = {}
-                    new_cat['id'] = DET_CATEGORIES[i]
+                    new_cat['id'] = DET_CATEGORIES[i].item()
                     new_cat['mask'] = mask.encode(np.asfortranarray(np.array(islice[0], dtype=np.uint8)))
                     new_cat['mask']['counts'] = new_cat['mask']['counts'].decode("utf-8")
                     im_pred['segm'].append(new_cat)
