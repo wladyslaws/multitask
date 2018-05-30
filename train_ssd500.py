@@ -772,6 +772,7 @@ def main():
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-e', '--epochs', type=int, default=10)
     parser.add_argument('--load_cache')
+    parser.add_argument('--evaluate', type=bool, default=False)
     args = parser.parse_args()
 
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -831,7 +832,7 @@ def main():
 
 
     # validation dataset prediction
-    if True:
+    if args.evaluate == True:
         model.eval()
         results = {}
         for batch_idx, (data, _, _, im_id, _, img_shape, _, _, _) in enumerate(val_loader):
