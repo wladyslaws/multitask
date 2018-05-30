@@ -361,7 +361,7 @@ def get_bboxes(data):
         labels[key] = np.array(labels[key])
     return (result, labels)
 
-
+#parse annotations from part dictionary
 def create_parts_dict(data):
     final_dict = {}
     im2elem = {}
@@ -488,6 +488,7 @@ class VOCClassPascal(data.Dataset):
     def __len__(self):
         return len(self.files[self.split])
 
+# load image and the proper parts
     def __getitem__(self, index):
         data_file = self.files[self.split][index]
         # load image
