@@ -892,7 +892,6 @@ def main():
         now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
         name = 'TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
         with open(name + '.json', 'a') as f:
-            multitask_utils.print_dict_types(results)
             json.dump(results, f)
 
 if __name__ == '__main__':
