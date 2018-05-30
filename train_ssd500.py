@@ -279,7 +279,7 @@ class SSD512Densenet(nn.Module):
         self.det_loc_layer = nn.Conv2d(128, self.num_of_boxes * 4, 3, padding=1)
         self.det_cls_layer = nn.Conv2d(128, self.num_of_boxes * NUM_DETECTION_CLASSES, 3, padding=1)
         self.seg_layer = nn.Conv2d(128, 61, 3, padding=1)
-        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1)
+        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1) #sprawdzic czy to jest koincydencja ze masz 61 w seg layer i 61 w parts,bo w VOC pascal context masz 59 labeli
         self.bounds_layer = nn.Conv2d(128, 1, 3, padding=1)
         self.sem_bounds_layer = nn.Conv2d(128, 20, 3, padding=1)
 
@@ -303,7 +303,7 @@ class SSD512Densenet(nn.Module):
 
         if not is_training:
             return det_boxes_pred, det_label_pred, seg_pred, parts_pred, bounds_pred, sem_bounds_pred
-
+# detection, hard, detection localization mozesz wyekstrahowac
         # detection classification loss
         pos = det_labels_enc > 0  # [N, #anchors]
         cls_loss = F.cross_entropy(det_label_pred.view(-1, NUM_DETECTION_CLASSES), det_labels_enc.view(-1), reduce=False)  # [N*#anchors,]
@@ -502,6 +502,7 @@ class VOCClassPascal(data.Dataset):
         detection = self.detections[img_id]
         label = self.labels[img_id]
 
+# to sa elementy do uczenia:
         parts = self.parts_dict[img_id]
         bounds = self.details.getBounds(img_name, show=False)
         bounds = np.array(bounds)[np.newaxis,:,:]
