@@ -14,11 +14,10 @@ If you do not change photo sets you can from now on go with:
 
 to omit a long step of caching.
 
-Every 100 epochs (number of epochs can be changed with option `-e` or `--epochs`) we perform validation step. The validation step creates data for evaluation `epochx.json` where `x` is number of epoch. This `epochx.json` can be found under the path:
-> /voc/logs/Model-(something)/epochx.json
+Every 100 epochs (number of epochs can be changed with option `-e` or `--epochs`) we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-HHmmss.json`.
 
 If you now switch directory to `evaluation` you can evaluate your results here. For example if you want to evaluate segmentation just go:
 
->`$python create_segmentation_file.py (path to epoch)`
+>`$python create_segmentation_file.py (path to data TIME json file)`
 
 >`$python script_segmentations.py`
