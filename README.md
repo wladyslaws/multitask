@@ -12,9 +12,9 @@ in order to run.
 If you do not change photo sets you can from now on go with:
 > `$python train_ssd500.py --load_cache True`
 
-to omit a long step of caching.
+to omit a long step of caching. You can change number of epochs with option `-e` or `--epochs`.
 
-Every 100 epochs (number of epochs can be changed with option `-e` or `--epochs`) we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-HHmmss.json`.
+At the end of training we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-HHmmss.json`.
 
 If you now switch directory to `evaluation` you can evaluate your results here. For example if you want to evaluate segmentation just go:
 
