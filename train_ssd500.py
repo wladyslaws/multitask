@@ -462,7 +462,7 @@ class VOCClassPascal(data.Dataset):
         self.split = split+"_list"
         self._transform = transform
         dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2010')
-        self.details = Detail(dataset_dir + "/trainval_withkeypoints.json", "", "trainval")
+        self.details = Detail(dataset_dir + "/trainval_withkeypoints.json", dataset_dir + "/JPEGImages", "trainval")
         # VOC2011 and others are subset of VOC2012
         self.files = collections.defaultdict(list)
         self.detections, self.labels = get_bboxes(self.details.data)
