@@ -17,3 +17,5 @@ valparts.pickle
 TIME*
 .idea/**
 lsyncd_config.lua
+venv/**
+trainval_preview1.json
