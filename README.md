@@ -1,9 +1,23 @@
-In order to run this:
-please copy photos of voc2010 and trainval\_withkeypoints to their catalogs (data/datasets/VOC/VOCdevkit/VOC2010/JPEGImages/ and data/datasets/VOC/VOCdevkit/VOC2010/ respectively).
-In pytorch\_fcn run python setup.py install
-Now go to pytorch-fcn/examples/voc/ and run python train\_ssd500.py -g 0in order to run.
-If you do not chcange photo sets you can from now on go with python train\ssd500.py -g 0 --load\_cache True thus ommiting a long step of caching.
-every 100 epochs (can be changed easily) we perform validation step. The validation step creates data for evaluation epochx.json where x is number of epoch. The json can be found under pytorch-fcn/examples/voc/logs/Model-(something)/epochx.json
-If you now switch directory to evaluation you can evaluate your results here. For example if you want to evaluate segmentation just go:
-python create\_segmentation\_file.py (path to epoch)
-python script\_segmentations.py
+## In order to run this:
+
+please copy VOC2010 photos to their catalogs:
+- `VOC2010` to `data/datasets/VOC/VOCdevkit/VOC2010/JPEGImages/`
+- `trainval_withkeypoints` to `data/datasets/VOC/VOCdevkit/VOC2010/`
+
+and launch:
+> `$python train_ssd500.py`
+
+in order to run.
+
+If you do not change photo sets you can from now on go with:
+> `$python train_ssd500.py --load_cache True`
+
+to omit a long step of caching. You can change number of epochs with option `-e` or `--epochs`.
+
+At the end of training we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-HHmmss.json`.
+
+If you now switch directory to `evaluation` you can evaluate your results here. For example if you want to evaluate segmentation just go:
+
+>`$python create_segmentation_file.py (path to data TIME json file)`
+
+>`$python script_segmentations.py`

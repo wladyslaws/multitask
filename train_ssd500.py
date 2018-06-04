@@ -21,6 +21,7 @@ from torch.autograd import Variable
 from torch.utils import data
 import torch.utils.model_zoo as model_zoo
 from collections import OrderedDict
+import multitask_utils
 
 NUM_DETECTION_CLASSES = 49
 
@@ -278,7 +279,7 @@ class SSD512Densenet(nn.Module):
         self.det_loc_layer = nn.Conv2d(128, self.num_of_boxes * 4, 3, padding=1)
         self.det_cls_layer = nn.Conv2d(128, self.num_of_boxes * NUM_DETECTION_CLASSES, 3, padding=1)
         self.seg_layer = nn.Conv2d(128, 61, 3, padding=1)
-        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1)
+        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1) #sprawdzic czy to jest koincydencja ze masz 61 w seg layer i 61 w parts,bo w VOC pascal context masz 59 labeli
         self.bounds_layer = nn.Conv2d(128, 1, 3, padding=1)
         self.sem_bounds_layer = nn.Conv2d(128, 20, 3, padding=1)
 
@@ -302,7 +303,7 @@ class SSD512Densenet(nn.Module):
 
         if not is_training:
             return det_boxes_pred, det_label_pred, seg_pred, parts_pred, bounds_pred, sem_bounds_pred
-
+# detection, hard, detection localization mozesz wyekstrahowac
         # detection classification loss
         pos = det_labels_enc > 0  # [N, #anchors]
         cls_loss = F.cross_entropy(det_label_pred.view(-1, NUM_DETECTION_CLASSES), det_labels_enc.view(-1), reduce=False)  # [N*#anchors,]
@@ -360,7 +361,7 @@ def get_bboxes(data):
         labels[key] = np.array(labels[key])
     return (result, labels)
 
-
+#parse annotations from part dictionary
 def create_parts_dict(data):
     final_dict = {}
     im2elem = {}
@@ -461,7 +462,7 @@ class VOCClassPascal(data.Dataset):
         self.split = split+"_list"
         self._transform = transform
         dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2010')
-        self.details = Detail(dataset_dir + "/trainval_withkeypoints.json", "", "trainval")
+        self.details = Detail(dataset_dir + "/trainval_withkeypoints.json", dataset_dir + "/JPEGImages", "trainval")
         # VOC2011 and others are subset of VOC2012
         self.files = collections.defaultdict(list)
         self.detections, self.labels = get_bboxes(self.details.data)
@@ -487,6 +488,7 @@ class VOCClassPascal(data.Dataset):
     def __len__(self):
         return len(self.files[self.split])
 
+# load image and the proper parts
     def __getitem__(self, index):
         data_file = self.files[self.split][index]
         # load image
@@ -501,6 +503,7 @@ class VOCClassPascal(data.Dataset):
         detection = self.detections[img_id]
         label = self.labels[img_id]
 
+# to sa elementy do uczenia:
         parts = self.parts_dict[img_id]
         bounds = self.details.getBounds(img_name, show=False)
         bounds = np.array(bounds)[np.newaxis,:,:]
@@ -766,15 +769,15 @@ class SSDBoxCoder:
 
         return boxes, labels, scores
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-e', '--epochs', type=int, default=10)
     parser.add_argument('--load_cache')
+    parser.add_argument('--evaluate', type=bool, default=False)
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1,0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     assert torch.cuda.is_available()
     torch.manual_seed(1337)
     torch.cuda.manual_seed(1337)
@@ -785,7 +788,7 @@ def main():
 
     if args.epochs > 0:
         train_loader = torch.utils.data.DataLoader(
-            VOCClassPascal(osp.expanduser('~/data/datasets'), box_coder, split='train', transform=True, load_cache = args.load_cache),
+            VOCClassPascal('data/datasets', box_coder, split='train', transform=True, load_cache = args.load_cache),
             batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
 
     # training
@@ -821,17 +824,17 @@ def main():
                 print('bounds_loss', bounds_loss.data[0])
                 print('sem_bounds_loss', sem_bounds_loss.data[0])
 
-    #torch.save(model, 'multitask.pth')
-    model = torch.load('multitask_backup.pth')
+    torch.save(model, 'multitask.pth')
+    #model = torch.load('multitask_backup.pth')
 
     # validation dataset
     val_loader = torch.utils.data.DataLoader(
-        VOCClassPascal(osp.expanduser('~/data/datasets'), box_coder, split='val', transform=True, load_cache = args.load_cache),
+        VOCClassPascal('data/datasets', box_coder, split='val', transform=True, load_cache = args.load_cache),
         batch_size=1, shuffle=False, num_workers=4, pin_memory=True)
 
 
     # validation dataset prediction
-    if True:
+    if args.evaluate == True:
         model.eval()
         results = {}
         for batch_idx, (data, _, _, im_id, _, img_shape, _, _, _) in enumerate(val_loader):
@@ -856,7 +859,7 @@ def main():
                 islice = 1*(seg_pred==i)
                 if np.sum(islice.flatten())>0:
                     new_cat = {}
-                    new_cat['id'] = DET_CATEGORIES[i]
+                    new_cat['id'] = DET_CATEGORIES[i].item()
                     new_cat['mask'] = mask.encode(np.asfortranarray(np.array(islice[0], dtype=np.uint8)))
                     new_cat['mask']['counts'] = new_cat['mask']['counts'].decode("utf-8")
                     im_pred['segm'].append(new_cat)
@@ -893,7 +896,6 @@ def main():
         name = 'TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
         with open(name + '.json', 'a') as f:
             json.dump(results, f)
-
 
 if __name__ == '__main__':
     main()
