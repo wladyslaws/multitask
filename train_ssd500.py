@@ -376,7 +376,7 @@ def create_parts_dict(data):
     i = 0
     for name in im2elem.keys():
         if i%100==0:
-            print('parts annotation in image: ' + str(i) + ' with image id: ' + str(name))
+            print(i)
         i = i+1
         temp = im2elem[name]
         all_img = np.zeros(im2shape[name], dtype=np.uint8)
@@ -463,7 +463,7 @@ class VOCClassPascal(data.Dataset):
         self._transform = transform
         dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2010')
         self.details = Detail(dataset_dir + "/trainval_withkeypoints.json", dataset_dir + "/JPEGImages", "trainval")
-        # VOC2011 and others are a subset of the VOC2012
+        # VOC2011 and others are subset of VOC2012
         self.files = collections.defaultdict(list)
         self.detections, self.labels = get_bboxes(self.details.data)
         self.change_labels = np.vectorize(lambda x: np.where(DET_CATEGORIES == x)[0][0])
