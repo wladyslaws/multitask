@@ -475,7 +475,7 @@ class VOCClassPascal(data.Dataset):
         self.sem_bound = json.load(open(dataset_dir+"/result.json"))
         for split in ['train_list', 'val_list']:
             imgsets_file = osp.join(
-                dataset_dir, 'ImageSets/Segmentation/%s.txt' % split)
+                dataset_dir, '/%s.txt' % split)
             for did in open(imgsets_file):
                 did = did.strip()
                 did = str(did)[:4]+"_"+str(did)[4:]
