@@ -478,7 +478,7 @@ class VOCClassPascal(data.Dataset):
                 dataset_dir, '%s.txt' % split)
             for did in open(imgsets_file):
                 did = did.strip()
-                did = str(did)[:4]+"_"+str(did)[4:]
+                did = str(did)[:4] + "_" + str(did)[5:]
                 img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
                 self.files[split].append({
                     'id': str(did),
