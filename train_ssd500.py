@@ -303,7 +303,7 @@ class SSD512Densenet(nn.Module):
 
         if not is_training:
             return det_boxes_pred, det_label_pred, seg_pred, parts_pred, bounds_pred, sem_bounds_pred
-# detection, hard, detection localization mozesz wyekstrahowac
+        # seg and parts only to be left
         # detection classification loss
         pos = det_labels_enc > 0  # [N, #anchors]
         cls_loss = F.cross_entropy(det_label_pred.view(-1, NUM_DETECTION_CLASSES), det_labels_enc.view(-1), reduce=False)  # [N*#anchors,]
@@ -503,7 +503,7 @@ class VOCClassPascal(data.Dataset):
         detection = self.detections[img_id]
         label = self.labels[img_id]
 
-# to sa elementy do uczenia:
+        # load training data:
         parts = self.parts_dict[img_id]
         bounds = self.details.getBounds(img_name, show=False)
         bounds = np.array(bounds)[np.newaxis,:,:]
