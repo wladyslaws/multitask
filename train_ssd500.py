@@ -279,7 +279,7 @@ class SSD512Densenet(nn.Module):
         self.det_loc_layer = nn.Conv2d(128, self.num_of_boxes * 4, 3, padding=1)
         self.det_cls_layer = nn.Conv2d(128, self.num_of_boxes * NUM_DETECTION_CLASSES, 3, padding=1)
         self.seg_layer = nn.Conv2d(128, 61, 3, padding=1)
-        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1) #sprawdzic czy to jest koincydencja ze masz 61 w seg layer i 61 w parts,bo w VOC pascal context masz 59 labeli
+        self.parts_layer = nn.Conv2d(128, 61, 3, padding=1)
         self.bounds_layer = nn.Conv2d(128, 1, 3, padding=1)
         self.sem_bounds_layer = nn.Conv2d(128, 20, 3, padding=1)
 
@@ -299,10 +299,10 @@ class SSD512Densenet(nn.Module):
         seg_pred = self.seg_layer(x)
         parts_pred = self.parts_layer(x)
         bounds_pred = self.bounds_layer(x)
-        sem_bounds_pred = self.sem_bounds_layer(x)
+        # sem_bounds_pred = self.sem_bounds_layer(x)
 
         if not is_training:
-            return det_boxes_pred, det_label_pred, seg_pred, parts_pred, bounds_pred, sem_bounds_pred
+            return det_boxes_pred, det_label_pred, seg_pred, parts_pred, bounds_pred#, sem_bounds_pred
         # seg and parts only to be left
         # detection classification loss
         pos = det_labels_enc > 0  # [N, #anchors]
@@ -325,9 +325,9 @@ class SSD512Densenet(nn.Module):
         seg_loss = F.nll_loss(F.log_softmax(seg_pred, dim=1), seg_gt)
         parts_loss = F.nll_loss(F.log_softmax(parts_pred, dim=1), parts_gt)
         bounds_loss = F.binary_cross_entropy(F.sigmoid(bounds_pred.squeeze(1)), bounds_gt)
-        sem_bounds_loss = F.binary_cross_entropy(F.sigmoid(sem_bounds_pred), sem_bounds_gt)
+        # sem_bounds_loss = F.binary_cross_entropy(F.sigmoid(sem_bounds_pred), sem_bounds_gt)
 
-        return cls_loss, loc_loss, seg_loss, parts_loss, bounds_loss, sem_bounds_loss
+        return cls_loss, loc_loss, seg_loss, parts_loss, bounds_loss#, sem_bounds_loss
 
 
 def map_on_cluster(x, clusters):
@@ -472,7 +472,7 @@ class VOCClassPascal(data.Dataset):
             pickle.dump(self.parts_dict, open(str(split) + "parts.pickle", "wb"), protocol=2)
         else:
             self.parts_dict = pickle.load(open(str(split) + "parts.pickle", "rb"))
-        self.sem_bound = json.load(open(dataset_dir+"/result.json"))
+        # self.sem_bound = json.load(open(dataset_dir+"/result.json"))
         for split in ['train_list', 'val_list']:
             imgsets_file = osp.join(
                 dataset_dir, '%s.txt' % split)
@@ -507,14 +507,14 @@ class VOCClassPascal(data.Dataset):
         parts = self.parts_dict[img_id]
         bounds = self.details.getBounds(img_name, show=False)
         bounds = np.array(bounds)[np.newaxis,:,:]
-        sb = self.sem_bound[img_name]
-        sem_bounds = np.array([mask.decode(sb[i]) for i in sb])
+        # sb = self.sem_bound[img_name]
+        # sem_bounds = np.array([mask.decode(sb[i]) for i in sb])
         if self._transform:
-            return self.transform(img, detection, label, img_id, seg_gt, shape, parts, bounds, sem_bounds)
+            return self.transform(img, detection, label, img_id, seg_gt, shape, parts, bounds)
         else:
-            return img, detection, label, img_id, seg_gt,shape, parts, bounds, sem_bounds
+            return img, detection, label, img_id, seg_gt,shape, parts, bounds
 
-    def transform(self, img, lbl, lbl2, im_id, seg_gt, shape, parts, bounds, sem_bounds):
+    def transform(self, img, lbl, lbl2, im_id, seg_gt, shape, parts, bounds):
         w,h,_ = img.shape
         new_img = np.zeros((512,512,3), dtype=np.uint8)
         new_img[:w,:h,:] = img
@@ -529,8 +529,8 @@ class VOCClassPascal(data.Dataset):
         bounds_gt_transformed = np.zeros((512,512), dtype=np.int32)
         bounds_gt_transformed[:w,:h] = bounds
 
-        sem_bounds_gt_transformed = np.zeros((20,512,512), dtype=np.int32)
-        sem_bounds_gt_transformed[:,:w,:h] = sem_bounds
+        # sem_bounds_gt_transformed = np.zeros((20,512,512), dtype=np.int32)
+        # sem_bounds_gt_transformed[:,:w,:h] = sem_bounds
 
         img = img[:, :, ::-1]  # RGB -> BGR
         img = img.astype(np.float64)
@@ -542,11 +542,11 @@ class VOCClassPascal(data.Dataset):
         seg_gt_transformed = torch.from_numpy(seg_gt_transformed).long()
         parts_gt_transformed = torch.from_numpy(parts_gt_transformed).long()
         bounds_gt_transformed = torch.from_numpy(bounds_gt_transformed).float()
-        sem_bounds_gt_transformed = torch.from_numpy(sem_bounds_gt_transformed).float()
+        # sem_bounds_gt_transformed = torch.from_numpy(sem_bounds_gt_transformed).float()
 
         lbl, lbl2 = self.box_coder.encode(lbl, lbl2)
 
-        return img, lbl, lbl2, im_id, seg_gt_transformed, shape, parts_gt_transformed, bounds_gt_transformed, sem_bounds_gt_transformed
+        return img, lbl, lbl2, im_id, seg_gt_transformed, shape, parts_gt_transformed, bounds_gt_transformed
 
     def untransform(self, img, lbl):
         img = img.numpy()
@@ -793,7 +793,7 @@ def main():
 
     # training
     for epoch in range(0, args.epochs):
-        for batch_idx, (data, det_boxes_enc, det_labels_enc, _, seg_gt, _, parts_gt, bounds_gt, sem_bounds_gt) in enumerate(train_loader):
+        for batch_idx, (data, det_boxes_enc, det_labels_enc, _, seg_gt, _, parts_gt, bounds_gt) in enumerate(train_loader):
 
             assert model.training
             optim.zero_grad()
@@ -804,10 +804,10 @@ def main():
             seg_gt = Variable(seg_gt.cuda())
             parts_gt = Variable(parts_gt.cuda())
             bounds_gt = Variable(bounds_gt.cuda())
-            sem_bounds_gt = Variable(sem_bounds_gt.cuda())
+            # sem_bounds_gt = Variable(sem_bounds_gt.cuda())
 
-            cls_loss, loc_loss, seg_loss, parts_loss, bounds_loss, sem_bounds_loss = model(data, True, det_boxes_enc, det_labels_enc, seg_gt, parts_gt, bounds_gt, sem_bounds_gt)
-            loss = cls_loss + loc_loss + seg_loss + parts_loss + bounds_loss + sem_bounds_loss
+            cls_loss, loc_loss, seg_loss, parts_loss, bounds_loss = model(data, True, det_boxes_enc, det_labels_enc, seg_gt, parts_gt, bounds_gt)
+            loss = cls_loss + loc_loss + seg_loss + parts_loss + bounds_loss
             loss = loss.sum() / len(data)
             loss.backward()
             optim.step()
@@ -822,7 +822,7 @@ def main():
                 print('seg_loss', seg_loss.data[0])
                 print('parts_loss', parts_loss.data[0])
                 print('bounds_loss', bounds_loss.data[0])
-                print('sem_bounds_loss', sem_bounds_loss.data[0])
+                # print('sem_bounds_loss', sem_bounds_loss.data[0])
 
     torch.save(model, 'multitask.pth')
     #model = torch.load('multitask_backup.pth')
@@ -883,12 +883,12 @@ def main():
             im_pred['bound']['counts'] = im_pred['bound']['counts'].decode("utf-8")
 
             # sem bounds prediction
-            sem_bound_thresh = 1 * (sem_bounds_pred.data.cpu() > 0)
-            im_pred['sem_bound'] = []
-            for i in range(20):
-                res = mask.encode(np.asfortranarray(np.array(sem_bound_thresh[0][i], dtype=np.uint8)))
-                res['counts'] = res['counts'].decode("utf-8")
-                im_pred['sem_bound'].append(res)
+            # sem_bound_thresh = 1 * (sem_bounds_pred.data.cpu() > 0)
+            # im_pred['sem_bound'] = []
+            # for i in range(20):
+            #     res = mask.encode(np.asfortranarray(np.array(sem_bound_thresh[0][i], dtype=np.uint8)))
+            #     res['counts'] = res['counts'].decode("utf-8")
+            #     im_pred['sem_bound'].append(res)
 
             results[str(im_id.numpy()[0])] = im_pred
 
