@@ -1,6 +1,12 @@
 ## In order to run this:
 
-please copy VOC2010 photos to their catalogs:
+---
+
+Important! Somehow files with names: **2010_001592.jpg, 2010_001606.jpg** and **2008_003252.jpg** lack their respective annotations in trainval_withkeypoints.json data, hence you have to remove them from downloaded JPEGImages folder in order to evade dreadful crash during training. We are working to make this code failsafe in this matter.
+
+---
+
+Please copy VOC2010 photos to their catalogs:
 - `VOC2010` to `data/datasets/VOC/VOCdevkit/VOC2010/JPEGImages/`
 - `trainval_withkeypoints` to `data/datasets/VOC/VOCdevkit/VOC2010/`
 
