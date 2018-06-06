@@ -20,7 +20,7 @@ If you do not change photo sets you can from now on go with:
 
 to omit a long step of caching. You can change number of epochs with option `-e` or `--epochs`.
 
-At the end of training we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-HHmmss.json`.
+At the end of training we perform validation step. The validation step creates data for evaluation in the file `TIME-YYYYMMDD-hhmmss.json`.
 
 If you now switch directory to `evaluation` you can evaluate your results here. For example if you want to evaluate segmentation just go:
 
