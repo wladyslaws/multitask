@@ -4,6 +4,8 @@
 
 Important! Somehow files with names: **2010_001592.jpg, 2010_001606.jpg** and **2008_003252.jpg** lack their respective annotations in trainval_withkeypoints.json data, hence you have to remove them from downloaded JPEGImages folder in order to evade dreadful crash during training. We are working to make this code failsafe in this matter.
 
+Remove mentioned images ids, i.e.  **2010_001592*, **2010_001606**, **2008_003252** from **train_list.txt** and **val_list.txt** files which are a source of the images for the training process.
+
 ---
 
 Please copy VOC2010 photos to their catalogs:
